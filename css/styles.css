@@ -14,9 +14,14 @@ body {
   padding-top: 70px; /* Ajuste para evitar que el contenido se superponga con la navbar */
 }
 
+.card {
+  margin: 10px;
+}
+
 .card img {
   max-height: 150px;
   object-fit: contain;
+  margin-bottom: 10px;
 }
 
 #productos-container {
@@ -67,4 +72,33 @@ body {
   padding-left: 0;
   font-size: 14px;
   color: #007bff;
+}
+
+/* Footer Styling */
+footer {
+  background-color: #f8f9fa;
+  padding: 40px 0;
+}
+
+footer .text-uppercase {
+  font-weight: 700;
+}
+
+footer ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+footer ul li a {
+  color: #343a40;
+  text-decoration: none;
+}
+
+footer ul li a:hover {
+  color: #007bff;
+}
+
+footer .bg-dark {
+  background-color: #343a40 !important;
+  padding: 10px 0;
 }

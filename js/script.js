@@ -2,46 +2,67 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch("https://fakestoreapi.com/products")
     .then((response) => response.json())
     .then((data) => {
-      const productosContainer = document.getElementById("productos");
+      const productosContainer = document.getElementById("productos-container");
       data.forEach((producto) => {
         productosContainer.innerHTML += `
-                    <div class="card">
-                        <img src="${producto.image}" class="card-img-top" alt="${producto.title}">
-                        <div class="card-body">
-                            <h5 class="card-title">${producto.title}</h5>
-                            <p class="card-text">${producto.description}</p>
-                            <p class="card-text">$${producto.price}</p>
-                            <button class="btn btn-primary" onclick="addToCart(${producto.id})">Añadir al carrito</button>
-                        </div>
-                    </div>
-                `;
+                  <div class="card">
+                      <img src="${producto.image}" class="card-img-top" alt="${producto.title}">
+                      <div class="card-body">
+                          <h5 class="card-title">${producto.title}</h5>
+                          <p class="card-text">${producto.description}</p>
+                          <p class="card-text">$${producto.price}</p>
+                          <button class="btn btn-primary" onclick="addToCart(${producto.id})">Añadir al carrito</button>
+                      </div>
+                  </div>
+              `;
       });
-    })
-    .catch((error) => console.error("Error fetching the products:", error));
+    });
+
+  document.getElementById("vaciar-carrito").addEventListener("click", () => {
+    localStorage.clear();
+    updateCartUI();
+  });
+
+  updateCartUI();
 });
 
-function addToCart(productId) {
+function addToCart(id) {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const productExists = cart.find((item) => item.id === productId);
-
-  if (productExists) {
-    productExists.quantity += 1;
+  let existingProduct = cart.find((product) => product.id === id);
+  if (existingProduct) {
+    existingProduct.quantity++;
   } else {
-    cart.push({ id: productId, quantity: 1 });
+    cart.push({ id, quantity: 1 });
   }
-
   localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCounter();
+  updateCartUI();
 }
 
-function updateCartCounter() {
+function updateCartUI() {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const cartCounter = document.getElementById("cart-counter");
-  cartCounter.innerText = cart.reduce(
-    (total, item) => total + item.quantity,
+  const carritoItems = document.getElementById("carrito-items");
+  carritoItems.innerHTML = "";
+  let total = 0;
+  cart.forEach((item) => {
+    fetch(`https://fakestoreapi.com/products/${item.id}`)
+      .then((response) => response.json())
+      .then((product) => {
+        carritoItems.innerHTML += `
+                  <div class="card">
+                      <img src="${product.image}" class="card-img-top" alt="${product.title}">
+                      <div class="card-body">
+                          <h5 class="card-title">${product.title}</h5>
+                          <p class="card-text">Cantidad: ${item.quantity}</p>
+                          <p class="card-text">Precio: $${product.price}</p>
+                      </div>
+                  </div>
+              `;
+        total += product.price * item.quantity;
+        document.getElementById("carrito-total").textContent = total.toFixed(2);
+      });
+  });
+  document.getElementById("cart-counter").textContent = cart.reduce(
+    (sum, item) => sum + item.quantity,
     0
   );
 }
-
-// Llama a updateCartCounter() al cargar la página para mostrar el número correcto de productos en el carrito
-updateCartCounter();

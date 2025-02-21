@@ -22,5 +22,3 @@ index.html: Página principal del sitio.
 css/styles.css: Estilos CSS personalizados.
 js/script.js: Funciones JavaScript para la interactividad y el manejo del carrito de compras.
 
-Autor
-Nombre Apellido - Desarrollador Front-End

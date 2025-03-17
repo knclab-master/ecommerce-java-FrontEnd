@@ -14,11 +14,31 @@ body {
   padding-top: 70px; /* Ajuste para evitar que el contenido se superponga con la navbar */
 }
 
+a,
+.btn,
+.btn-link,
+.btn-primary,
+.btn-danger {
+  color: #555555 !important;
+  background-color: #e0e0e0 !important;
+  border-color: #aaaaaa !important;
+}
+
+a:hover,
+.btn:hover,
+.btn-link:hover,
+.btn-primary:hover,
+.btn-danger:hover {
+  background-color: #d3d3d3 !important;
+  color: #000000 !important;
+}
+
 .card {
   margin: 10px;
 }
 
 .card img {
+  filter: grayscale(100%);
   max-height: 150px;
   object-fit: contain;
   margin-bottom: 10px;

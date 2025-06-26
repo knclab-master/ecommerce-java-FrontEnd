@@ -83,31 +83,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // FUNCIÓN UPDATECARTUI MODIFICADA PARA MOSTRAR TARJETAS
   function updateCartUI() {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const carritoItems = document.getElementById("carrito-items");
     carritoItems.innerHTML = "";
     let total = 0;
 
-    cart.forEach((item) => {
-      carritoItems.innerHTML += `
-        <div class="card d-flex flex-row align-items-center p-2 mb-2">
-          <img src="${
-            item.image
-          }" class="card-img-top" style="width: 50px; height: 50px;" alt="${
-        item.title
-      }">
-          <div class="card-body">
-            <h5 class="card-title">${item.title}</h5>
-            <p class="card-text">Cantidad: ${item.quantity}</p>
-            <p class="card-text">Precio: $${(
-              item.price * item.quantity
-            ).toFixed(2)}</p>
+    if (cart.length === 0) {
+      carritoItems.innerHTML =
+        '<p class="text-center text-muted">Tu carrito está vacío</p>';
+      document.getElementById("realizar-compra").disabled = true;
+    } else {
+      document.getElementById("realizar-compra").disabled = false;
+
+      cart.forEach((item) => {
+        carritoItems.innerHTML += `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.title}">
+            <div class="card-body">
+              <h6 class="card-title">${item.title}</h6>
+              <p class="card-text">Cantidad: <strong>${
+                item.quantity
+              }</strong></p>
+              <p class="card-text">Precio unitario: $${item.price}</p>
+              <p class="card-text">Subtotal: <strong>$${(
+                item.price * item.quantity
+              ).toFixed(2)}</strong></p>
+              <button class="btn btn-sm btn-danger" onclick="removeFromCart(${
+                item.id
+              })">
+                Eliminar
+              </button>
+            </div>
           </div>
-        </div>
-      `;
-      total += item.price * item.quantity;
-    });
+        `;
+        total += item.price * item.quantity;
+      });
+    }
 
     document.getElementById("carrito-total").textContent = total.toFixed(2);
     document.getElementById("cart-counter").textContent = cart.reduce(
@@ -116,7 +129,40 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // NUEVA FUNCIÓN PARA ELIMINAR PRODUCTOS INDIVIDUALES
+  window.removeFromCart = function (id) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart = cart.filter((item) => item.id !== id);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartUI();
+  };
+
   document.getElementById("vaciar-carrito").addEventListener("click", () => {
+    localStorage.clear();
+    updateCartUI();
+  });
+
+  // NUEVA FUNCIONALIDAD PARA REALIZAR COMPRA
+  document.getElementById("realizar-compra").addEventListener("click", () => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      alert("Tu carrito está vacío");
+      return;
+    }
+
+    const total = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    document.getElementById("modal-total").textContent = total.toFixed(2);
+
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(
+      document.getElementById("compraExitosaModal")
+    );
+    modal.show();
+
+    // Limpiar el carrito después de la compra
     localStorage.clear();
     updateCartUI();
   });

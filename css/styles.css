@@ -1,6 +1,6 @@
 body {
   font-family: "Roboto", sans-serif;
-  padding-top: 5px;
+  padding-top: 80px;
   margin-right: 0;
 }
 
@@ -15,7 +15,7 @@ body {
   top: 135px;
   right: 0;
   width: 350px;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 135px);
   background-color: #f8f9fa;
   border-left: 1px solid #dee2e6;
   z-index: 1000;
@@ -51,6 +51,8 @@ body {
   font-size: 0.8rem;
   margin-left: 0.5rem;
 }
+
+/* ESTILOS ELIMINADOS - Ya no se usa el botón toggle */
 
 .cart-content {
   flex: 1;
@@ -213,6 +215,8 @@ a:hover,
 #reseñas .card {
   margin-bottom: 20px;
 }
+
+/* ESTILOS ORIGINALES MANTENIDOS */
 
 #contacto {
   padding: 10px;

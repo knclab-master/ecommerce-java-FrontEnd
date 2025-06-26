@@ -1,6 +1,6 @@
 body {
   font-family: "Roboto", sans-serif;
-  padding-top: 70px;
+  padding-top: 5px;
   margin-right: 0;
 }
 
@@ -12,10 +12,10 @@ body {
 /* CARRITO SIDEBAR */
 .cart-sidebar {
   position: fixed;
-  top: 0;
+  top: 135px;
   right: 0;
   width: 350px;
-  height: 100vh;
+  height: calc(100vh - 80px);
   background-color: #f8f9fa;
   border-left: 1px solid #dee2e6;
   z-index: 1000;
@@ -34,7 +34,7 @@ body {
   border-bottom: 1px solid #dee2e6;
   background-color: #fff;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -50,19 +50,6 @@ body {
   padding: 0.2rem 0.5rem;
   font-size: 0.8rem;
   margin-left: 0.5rem;
-}
-
-.btn-toggle-cart {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .cart-content {

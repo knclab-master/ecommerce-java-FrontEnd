@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // FUNCIÓN UPDATECARTUI MODIFICADA PARA MOSTRAR TARJETAS
+  // FUNCIÓN UPDATECARTUI PARA MOSTRAR TARJETAS
   function updateCartUI() {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const carritoItems = document.getElementById("carrito-items");
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // NUEVA FUNCIÓN PARA ELIMINAR PRODUCTOS INDIVIDUALES
+  // FUNCIÓN PARA ELIMINAR PRODUCTOS INDIVIDUALES
   window.removeFromCart = function (id) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart = cart.filter((item) => item.id !== id);
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCartUI();
   });
 
-  // NUEVA FUNCIONALIDAD PARA REALIZAR COMPRA
+  // FUNCIONALIDAD PARA REALIZAR COMPRA
   document.getElementById("realizar-compra").addEventListener("click", () => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     if (cart.length === 0) {

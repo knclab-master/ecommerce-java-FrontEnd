@@ -30,9 +30,9 @@
             <a href="#reseñas" class="text-dark">Reseñas</a>
           </li>
           <li class="itemMenu">
-            <a href="#carrito" class="text-dark"
-              >Carrito (<span id="cart-counter">0</span>)</a
-            >
+            <a href="#carrito" class="text-dark" id="open-cart">
+              Carrito (<span id="cart-counter-nav">0</span>)
+            </a>
           </li>
           <li class="itemMenu">
             <a href="#redes-sociales" class="text-dark">Redes Sociales</a>
@@ -41,7 +41,7 @@
       </nav>
     </header>
 
-    <main>
+    <main class="main-content">
       <section class="portada text-center p-5">
         <h1>Mi web e-commerce</h1>
         <p>
@@ -122,25 +122,39 @@
           </div>
         </div>
       </section>
-
-      <section id="carrito" class="contenedorCarrito container my-5">
-        <h2>Carrito</h2>
-        <ul id="carrito-items" class="list-group">
-          <!-- Items del carrito serán insertados aquí -->
-        </ul>
-        <div class="cart-actions mt-3">
-          <button id="vaciar-carrito" class="btn btn-danger">
-            Vaciar Carrito
-          </button>
-          <button id="realizar-compra" class="btn btn-success">
-            Realizar Compra
-          </button>
-        </div>
-        <div class="total mt-3">
-          <p>Total: <span id="carrito-total">$0</span></p>
-        </div>
-      </section>
     </main>
+
+    <!-- CARRITO SIDEBAR -->
+    <div id="cart-sidebar" class="cart-sidebar">
+      <div class="cart-header">
+        <h3>Carrito <span id="cart-counter" class="cart-counter">0</span></h3>
+        <button id="toggle-cart" class="btn-toggle-cart">×</button>
+      </div>
+
+      <div class="cart-content">
+        <div id="carrito-items" class="cart-items">
+          <!-- Items del carrito serán insertados aquí -->
+        </div>
+
+        <div class="cart-footer">
+          <div class="cart-total">
+            <strong>Total: $<span id="carrito-total">0</span></strong>
+          </div>
+
+          <div class="cart-actions">
+            <button id="vaciar-carrito" class="btn btn-danger btn-sm">
+              Vaciar
+            </button>
+            <button id="realizar-compra" class="btn btn-success">
+              Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay para móviles -->
+    <div id="cart-overlay" class="cart-overlay"></div>
 
     <!-- Modal de Compra Exitosa -->
     <div

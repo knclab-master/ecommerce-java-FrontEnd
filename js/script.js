@@ -92,22 +92,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (cart.length === 0) {
       carritoItems.innerHTML =
-        '<p class="text-center text-muted">Tu carrito está vacío</p>';
+        '<li class="text-center text-muted w-100">Tu carrito está vacío</li>';
       document.getElementById("realizar-compra").disabled = true;
     } else {
       document.getElementById("realizar-compra").disabled = false;
 
       cart.forEach((item) => {
-        carritoItems.innerHTML += `
-          <div class="cart-item">
+        const cartItemHTML = `
+          <li class="cart-item">
             <img src="${item.image}" alt="${item.title}">
             <div class="card-body">
               <h6 class="card-title">${item.title}</h6>
               <p class="card-text">Cantidad: <strong>${
                 item.quantity
               }</strong></p>
-              <p class="card-text">Precio unitario: $${item.price}</p>
-              <p class="card-text">Subtotal: <strong>$${(
+              <p class="card-text">Precio unitario: ${item.price}</p>
+              <p class="card-text">Subtotal: <strong>${(
                 item.price * item.quantity
               ).toFixed(2)}</strong></p>
               <button class="btn btn-sm btn-danger" onclick="removeFromCart(${
@@ -116,8 +116,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 Eliminar
               </button>
             </div>
-          </div>
+          </li>
         `;
+        carritoItems.innerHTML += cartItemHTML;
         total += item.price * item.quantity;
       });
     }

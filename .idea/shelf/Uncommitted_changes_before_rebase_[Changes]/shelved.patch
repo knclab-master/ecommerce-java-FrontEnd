@@ -1,0 +1,272 @@
+Index: README.md
+===================================================================
+diff --git a/README.md b/README.md
+deleted file mode 100644
+--- a/README.md	(revision 4201733bbd0a54f9430c73d1812f1ec432fcfbfe)
++++ /dev/null	(revision 4201733bbd0a54f9430c73d1812f1ec432fcfbfe)
+@@ -1,26 +0,0 @@
+-Proyecto E-commerce
+-
+-Descripción
+-Este proyecto es un sitio web de e-commerce interactivo desarrollado como parte del Trabajo Final Integrador del curso de Front-End. La página web permite a los usuarios navegar por productos, agregar artículos a un carrito de compras y realizar un pedido. Además, cuenta con un formulario de contacto funcional integrado con Formspree.
+-
+-Características:
+-
+-Estructura Semántica: Uso de etiquetas HTML5 semánticas para mejorar la accesibilidad y el SEO.
+-Responsive Design: Diseño adaptable a diferentes tamaños de pantalla utilizando CSS y Bootstrap.
+-Carrito de Compras: Funcionalidad completa de carrito de compras, que permite agregar, eliminar y visualizar productos, con datos almacenados en localStorage.
+-Consumo de API: Los productos se obtienen de una API REST y se muestran dinámicamente en la página.
+-Formulario de Contacto: Formulario de contacto funcional que envía datos a través de Formspree.
+-
+-Despliegue: Proyecto desplegado en GitHub Pages, accesible desde cualquier dispositivo con conexión a Internet.
+-Tecnologías Utilizadas
+-HTML5: Estructura semántica de la página web.
+-CSS3: Estilos personalizados y diseño responsivo.
+-Bootstrap: Framework para componentes y diseño responsivo.
+-JavaScript (ES6+): Interactividad, manipulación del DOM, y gestión del carrito de compras.
+-API REST: Consumo de datos para la visualización de productos.
+-Formspree: Manejo de envíos de formularios sin backend.
+-GitHub Pages: Despliegue del proyecto en la web.
+-Estructura del Proyecto
+-index.html: Página principal del sitio.
+-css/styles.css: Estilos CSS personalizados.
+-js/script.js: Funciones JavaScript para la interactividad y el manejo del carrito de compras.
+Index: js/script.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>document.addEventListener(\"DOMContentLoaded\", () => {\r\n  fetch(\"https://dummyjson.com/products\")\r\n    .then((response) => {\r\n      if (!response || !response.ok) {\r\n        throw new Error(\"API DummyJSON no disponible\");\r\n      }\r\n      return response.json();\r\n    })\r\n    .then((data) => {\r\n      if (data && data.products) {\r\n        cargarProductos(data.products.slice(0, 10)); // Solo mostramos 10 productos\r\n      } else {\r\n        throw new Error(\"Formato inesperado de DummyJSON\");\r\n      }\r\n    })\r\n    .catch((error) =>\r\n      console.error(\"Error al obtener productos de DummyJSON\", error)\r\n    );\r\n\r\n  function cargarProductos(data) {\r\n    const productosContainer = document.getElementById(\"productos-container\");\r\n    productosContainer.innerHTML = \"\";\r\n\r\n    data.forEach((producto) => {\r\n      const shortDescription =\r\n        producto.description.split(\" \").slice(0, 5).join(\" \") + \"...\";\r\n\r\n      productosContainer.innerHTML += `\r\n        <div class=\"card\">\r\n          <img src=\"${\r\n            producto.image || producto.thumbnail\r\n          }\" class=\"card-img-top\" alt=\"${producto.title}\">\r\n          <div class=\"card-body\">\r\n            <h5 class=\"card-title\">${producto.title}</h5>\r\n            <p class=\"card-text short-description\">${shortDescription}</p>\r\n            <p class=\"card-text full-description\" style=\"display: none;\">${\r\n              producto.description\r\n            }</p>\r\n            <button class=\"btn btn-link\" onclick=\"toggleDescription(this)\">Ver descripción</button>\r\n            <p class=\"card-text\">$${producto.price}</p>\r\n            <button class=\"btn btn-primary\" onclick=\"addToCart(${\r\n              producto.id\r\n            }, '${producto.image || producto.thumbnail}', '${\r\n        producto.title\r\n      }', ${producto.price}, this)\">Agregar al carrito</button>\r\n          </div>\r\n        </div>\r\n      `;\r\n    });\r\n  }\r\n\r\n  window.addToCart = function (id, image, title, price, button) {\r\n    let cart = JSON.parse(localStorage.getItem(\"cart\")) || [];\r\n    let existingProduct = cart.find((product) => product.id === id);\r\n    if (existingProduct) {\r\n      existingProduct.quantity++;\r\n    } else {\r\n      cart.push({ id, image, title, price, quantity: 1 });\r\n    }\r\n    localStorage.setItem(\"cart\", JSON.stringify(cart));\r\n    updateCartUI();\r\n\r\n    // Cambiar el texto del botón\r\n    button.textContent = \"Agregado\";\r\n    button.disabled = true;\r\n    setTimeout(() => {\r\n      button.textContent = \"Agregar al carrito\";\r\n      button.disabled = false;\r\n    }, 1000);\r\n  };\r\n\r\n  window.toggleDescription = function (button) {\r\n    const shortDescription = button.previousElementSibling;\r\n    const fullDescription = shortDescription.nextElementSibling;\r\n    if (fullDescription.style.display === \"none\") {\r\n      fullDescription.style.display = \"block\";\r\n      shortDescription.style.display = \"none\";\r\n      button.textContent = \"Ocultar descripción\";\r\n    } else {\r\n      fullDescription.style.display = \"none\";\r\n      shortDescription.style.display = \"block\";\r\n      button.textContent = \"Ver descripción\";\r\n    }\r\n  };\r\n\r\n  // FUNCIÓN UPDATECARTUI PARA MOSTRAR TARJETAS\r\n  function updateCartUI() {\r\n    const cart = JSON.parse(localStorage.getItem(\"cart\")) || [];\r\n    const carritoItems = document.getElementById(\"carrito-items\");\r\n    carritoItems.innerHTML = \"\";\r\n    let total = 0;\r\n\r\n    if (cart.length === 0) {\r\n      carritoItems.innerHTML =\r\n        '<li class=\"text-center text-muted w-100\">Tu carrito está vacío</li>';\r\n      document.getElementById(\"realizar-compra\").disabled = true;\r\n    } else {\r\n      document.getElementById(\"realizar-compra\").disabled = false;\r\n\r\n      cart.forEach((item) => {\r\n        const cartItemHTML = `\r\n          <li class=\"cart-item\">\r\n            <img src=\"${item.image}\" alt=\"${item.title}\">\r\n            <div class=\"card-body\">\r\n              <h6 class=\"card-title\">${item.title}</h6>\r\n              <p class=\"card-text\">Cantidad: <strong>${\r\n                item.quantity\r\n              }</strong></p>\r\n              <p class=\"card-text\">Precio unitario: ${item.price}</p>\r\n              <p class=\"card-text\">Subtotal: <strong>${(\r\n                item.price * item.quantity\r\n              ).toFixed(2)}</strong></p>\r\n              <button class=\"btn btn-sm btn-danger\" onclick=\"removeFromCart(${\r\n                item.id\r\n              })\">\r\n                Eliminar\r\n              </button>\r\n            </div>\r\n          </li>\r\n        `;\r\n        carritoItems.innerHTML += cartItemHTML;\r\n        total += item.price * item.quantity;\r\n      });\r\n    }\r\n\r\n    document.getElementById(\"carrito-total\").textContent = total.toFixed(2);\r\n    document.getElementById(\"cart-counter\").textContent = cart.reduce(\r\n      (sum, item) => sum + item.quantity,\r\n      0\r\n    );\r\n  }\r\n\r\n  // FUNCIÓN PARA ELIMINAR PRODUCTOS INDIVIDUALES\r\n  window.removeFromCart = function (id) {\r\n    let cart = JSON.parse(localStorage.getItem(\"cart\")) || [];\r\n    cart = cart.filter((item) => item.id !== id);\r\n    localStorage.setItem(\"cart\", JSON.stringify(cart));\r\n    updateCartUI();\r\n  };\r\n\r\n  document.getElementById(\"vaciar-carrito\").addEventListener(\"click\", () => {\r\n    localStorage.clear();\r\n    updateCartUI();\r\n  });\r\n\r\n  // FUNCIONALIDAD PARA REALIZAR COMPRA\r\n  document.getElementById(\"realizar-compra\").addEventListener(\"click\", () => {\r\n    const cart = JSON.parse(localStorage.getItem(\"cart\")) || [];\r\n    if (cart.length === 0) {\r\n      alert(\"Tu carrito está vacío\");\r\n      return;\r\n    }\r\n\r\n    const total = cart.reduce(\r\n      (sum, item) => sum + item.price * item.quantity,\r\n      0\r\n    );\r\n    document.getElementById(\"modal-total\").textContent = total.toFixed(2);\r\n\r\n    // Mostrar el modal\r\n    const modal = new bootstrap.Modal(\r\n      document.getElementById(\"compraExitosaModal\")\r\n    );\r\n    modal.show();\r\n\r\n    // Limpiar el carrito después de la compra\r\n    localStorage.clear();\r\n    updateCartUI();\r\n  });\r\n\r\n  updateCartUI();\r\n});\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/js/script.js b/js/script.js
+--- a/js/script.js	(revision 4201733bbd0a54f9430c73d1812f1ec432fcfbfe)
++++ b/js/script.js	(date 1754016150194)
+@@ -1,5 +1,5 @@
+ document.addEventListener("DOMContentLoaded", () => {
+-  fetch("https://dummyjson.com/products")
++  fetch("http://localhost:8080/api/productos")
+     .then((response) => {
+       if (!response || !response.ok) {
+         throw new Error("API DummyJSON no disponible");
+@@ -7,10 +7,10 @@
+       return response.json();
+     })
+     .then((data) => {
+-      if (data && data.products) {
+-        cargarProductos(data.products.slice(0, 10)); // Solo mostramos 10 productos
++      if (Array.isArray(data)) {
++        cargarProductos(data.slice(0, 10)); // Solo mostramos 10 productos
+       } else {
+-        throw new Error("Formato inesperado de DummyJSON");
++        throw new Error("Formato inesperado del backend");
+       }
+     })
+     .catch((error) =>
+@@ -23,44 +23,60 @@
+ 
+     data.forEach((producto) => {
+       const shortDescription =
+-        producto.description.split(" ").slice(0, 5).join(" ") + "...";
++        producto.descripcion.split(" ").slice(0, 5).join(" ") + "...";
++
++      // Mensaje especial para la última unidad
++      const stockMessage = producto.stock === 1
++        ? '<p class="ultima-unidad" style="color:red; font-weight:bold;">¡Última unidad!</p>'
++        : '';
+ 
+       productosContainer.innerHTML += `
+         <div class="card">
+-          <img src="${
+-            producto.image || producto.thumbnail
+-          }" class="card-img-top" alt="${producto.title}">
++          <img src="${producto.imagenUrl}" class="card-img-top" alt="${producto.nombre}">
+           <div class="card-body">
+-            <h5 class="card-title">${producto.title}</h5>
++            <h5 class="card-title">${producto.nombre}</h5>
++            ${stockMessage}
+             <p class="card-text short-description">${shortDescription}</p>
+-            <p class="card-text full-description" style="display: none;">${
+-              producto.description
+-            }</p>
++            <p class="card-text full-description" style="display: none;">${producto.descripcion}</p>
+             <button class="btn btn-link" onclick="toggleDescription(this)">Ver descripción</button>
+-            <p class="card-text">$${producto.price}</p>
+-            <button class="btn btn-primary" onclick="addToCart(${
++            <p class="card-text">$${producto.precio}</p>
++            <button class="btn btn-primary" ${
++              producto.stock === 0 ? 'disabled' : ''
++            } onclick="addToCart(${
+               producto.id
+-            }, '${producto.image || producto.thumbnail}', '${
+-        producto.title
+-      }', ${producto.price}, this)">Agregar al carrito</button>
++            }, '${producto.imagenUrl}', '${producto.nombre}', ${producto.precio}, ${producto.stock}, this)">
++              ${producto.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
++            </button>
+           </div>
+         </div>
+       `;
+     });
+   }
+ 
+-  window.addToCart = function (id, image, title, price, button) {
++  window.addToCart = function (id, imagenUrl, nombre, precio, stock, button) {
+     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+     let existingProduct = cart.find((product) => product.id === id);
++
++    if (stock === 0) {
++      alert("¡Este producto no tiene stock disponible!");
++      return;
++    }
++
+     if (existingProduct) {
+-      existingProduct.quantity++;
+-    } else {
+-      cart.push({ id, image, title, price, quantity: 1 });
++      if (existingProduct.quantity < stock) {
++        existingProduct.quantity++;
++      } else {
++        alert("¡No hay más stock disponible para este producto!");
++        return;
++      }
++    } else {
++      cart.push({ id, imagenUrl, nombre, precio, stock, quantity: 1 });
+     }
++
+     localStorage.setItem("cart", JSON.stringify(cart));
+     updateCartUI();
+ 
+-    // Cambiar el texto del botón
++    // Cambia el texto del botón
+     button.textContent = "Agregado";
+     button.disabled = true;
+     setTimeout(() => {
+@@ -100,26 +116,20 @@
+       cart.forEach((item) => {
+         const cartItemHTML = `
+           <li class="cart-item">
+-            <img src="${item.image}" alt="${item.title}">
++            <img src="${item.imagenUrl}" alt="${item.nombre}">
+             <div class="card-body">
+-              <h6 class="card-title">${item.title}</h6>
+-              <p class="card-text">Cantidad: <strong>${
+-                item.quantity
+-              }</strong></p>
+-              <p class="card-text">Precio unitario: ${item.price}</p>
+-              <p class="card-text">Subtotal: <strong>${(
+-                item.price * item.quantity
+-              ).toFixed(2)}</strong></p>
+-              <button class="btn btn-sm btn-danger" onclick="removeFromCart(${
+-                item.id
+-              })">
++              <h6 class="card-title">${item.nombre}</h6>
++              <p class="card-text">Cantidad: <strong>${item.quantity}</strong></p>
++              <p class="card-text">Precio unitario: ${item.precio}</p>
++              <p class="card-text">Subtotal: <strong>${(item.precio * item.quantity).toFixed(2)}</strong></p>
++              <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">
+                 Eliminar
+               </button>
+             </div>
+           </li>
+         `;
+         carritoItems.innerHTML += cartItemHTML;
+-        total += item.price * item.quantity;
++        total += item.precio * item.quantity;
+       });
+     }
+ 
+@@ -151,21 +161,44 @@
+       return;
+     }
+ 
+-    const total = cart.reduce(
+-      (sum, item) => sum + item.price * item.quantity,
+-      0
+-    );
+-    document.getElementById("modal-total").textContent = total.toFixed(2);
++    // Armar el pedido como array de líneas
++    const pedido = cart.map(item => ({
++      productoId: item.id,
++      cantidad: item.quantity
++    }));
++
++    // POST al backend
++    fetch("http://localhost:8080/api/pedidos", {
++      method: "POST",
++      headers: {
++        "Content-Type": "application/json"
++      },
++      body: JSON.stringify(pedido)
++    })
++      .then(response => {
++        if (!response.ok) {
++          throw new Error("Error al crear el pedido");
++        }
++        return response.json();
++      })
++      .then(pedidoCreado => {
++        // Mostrar total pagado según lo que responde la base de datos (pedidoCreado.total)
++        document.getElementById("modal-total").textContent =
++          pedidoCreado.total !== undefined ? pedidoCreado.total.toFixed(2) : "Error";
+ 
+-    // Mostrar el modal
+-    const modal = new bootstrap.Modal(
+-      document.getElementById("compraExitosaModal")
+-    );
+-    modal.show();
++        // Mostrar el modal
++        const modal = new bootstrap.Modal(
++          document.getElementById("compraExitosaModal")
++        );
++        modal.show();
+ 
+-    // Limpiar el carrito después de la compra
+-    localStorage.clear();
+-    updateCartUI();
++        // Limpiar el carrito después de la compra
++        localStorage.clear();
++        updateCartUI();
++      })
++      .catch(error => {
++        alert("No se pudo realizar la compra. " + error.message);
++      });
+   });
+ 
+   updateCartUI();
+Index: index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!DOCTYPE html>\r\n<html lang=\"es\">\r\n  <head>\r\n    <meta charset=\"UTF-8\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <title>Mi E-Commerce</title>\r\n    <link rel=\"stylesheet\" href=\"css/styles.css\" />\r\n    <link\r\n      href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css\"\r\n      rel=\"stylesheet\"\r\n    />\r\n  </head>\r\n\r\n  <body>\r\n    <header\r\n      class=\"d-flex justify-content-between align-items-center p-3 bg-light\"\r\n    >\r\n      <img\r\n        src=\"https://dummyimage.com/300x300/cccccc/000000.png\"\r\n        width=\"100\"\r\n        height=\"100\"\r\n        alt=\"Logo\"\r\n      />\r\n      <nav>\r\n        <ul class=\"menu d-flex list-unstyled gap-3\">\r\n          <li class=\"itemMenu\">\r\n            <a href=\"#productos\" class=\"text-dark\">Productos</a>\r\n          </li>\r\n          <li class=\"itemMenu\">\r\n            <a href=\"#reseñas\" class=\"text-dark\">Reseñas</a>\r\n          </li>\r\n          <li class=\"itemMenu\">\r\n            <a href=\"#carrito\" class=\"text-dark\" id=\"open-cart\">\r\n              Carrito (<span id=\"cart-counter-nav\">0</span>)\r\n            </a>\r\n          </li>\r\n          <li class=\"itemMenu\">\r\n            <a href=\"#redes-sociales\" class=\"text-dark\">Redes Sociales</a>\r\n          </li>\r\n        </ul>\r\n      </nav>\r\n    </header>\r\n\r\n    <main class=\"main-content\">\r\n      <section class=\"portada text-center p-5\">\r\n        <h1>Mi web e-commerce</h1>\r\n        <p>\r\n          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequatur\r\n          ducimus itaque rem!\r\n        </p>\r\n      </section>\r\n\r\n      <section id=\"productos\" class=\"contenedorCards container my-5\">\r\n        <h2 class=\"text-center\">Productos</h2>\r\n        <div\r\n          id=\"productos-container\"\r\n          class=\"d-flex flex-wrap justify-content-around gap-3\"\r\n        >\r\n          <!-- Productos serán insertados aquí -->\r\n        </div>\r\n      </section>\r\n\r\n      <!-- Sección de reseñas -->\r\n      <section id=\"reseñas\" class=\"container my-5\">\r\n        <h2 class=\"text-center\">Reseñas</h2>\r\n        <div class=\"row\">\r\n          <div class=\"col-12 col-md-4\">\r\n            <div class=\"card\">\r\n              <img\r\n                src=\"https://dummyimage.com/150x150/cccccc/000000.png\"\r\n                width=\"150\"\r\n                height=\"150\"\r\n                class=\"card-img-top\"\r\n                alt=\"Cliente 1\"\r\n              />\r\n              <div class=\"card-body\">\r\n                <h5 class=\"card-title\">Cliente 1</h5>\r\n                <p class=\"card-text\">\r\n                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure\r\n                  asperiores nobis voluptatum corporis eos atque accusamus\r\n                  provident unde.\r\n                </p>\r\n              </div>\r\n            </div>\r\n          </div>\r\n          <div class=\"col-12 col-md-4\">\r\n            <div class=\"card\">\r\n              <img\r\n                src=\"https://dummyimage.com/150x150/cccccc/000000.png\"\r\n                width=\"150\"\r\n                height=\"150\"\r\n                class=\"card-img-top\"\r\n                alt=\"Cliente 2\"\r\n              />\r\n              <div class=\"card-body\">\r\n                <h5 class=\"card-title\">Cliente 2</h5>\r\n                <p class=\"card-text\">\r\n                  Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vel\r\n                  similique ipsa et laudantium, animi ea eligendi quibusdam quis\r\n                  dolorum nulla.\r\n                </p>\r\n              </div>\r\n            </div>\r\n          </div>\r\n          <div class=\"col-12 col-md-4\">\r\n            <div class=\"card\">\r\n              <img\r\n                src=\"https://dummyimage.com/150x150/cccccc/000000.png\"\r\n                width=\"150\"\r\n                height=\"150\"\r\n                class=\"card-img-top\"\r\n                alt=\"Cliente 3\"\r\n              />\r\n              <div class=\"card-body\">\r\n                <h5 class=\"card-title\">Cliente 3</h5>\r\n                <p class=\"card-text\">\r\n                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem\r\n                  ullam illo facilis sint. Ullam omnis dolores inventore?\r\n                </p>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </section>\r\n    </main>\r\n\r\n    <!-- CARRITO SIDEBAR -->\r\n    <div id=\"cart-sidebar\" class=\"cart-sidebar\">\r\n      <div class=\"cart-header\">\r\n        <h3>Carrito <span id=\"cart-counter\" class=\"cart-counter\">0</span></h3>\r\n      </div>\r\n\r\n      <div class=\"cart-content\">\r\n        <div id=\"carrito-items\" class=\"cart-items\">\r\n          <!-- Items del carrito serán insertados aquí -->\r\n        </div>\r\n\r\n        <div class=\"cart-footer\">\r\n          <div class=\"cart-total\">\r\n            <strong>Total: $<span id=\"carrito-total\">0</span></strong>\r\n          </div>\r\n\r\n          <div class=\"cart-actions\">\r\n            <button id=\"vaciar-carrito\" class=\"btn btn-danger btn-sm\">\r\n              Vaciar\r\n            </button>\r\n            <button id=\"realizar-compra\" class=\"btn btn-success\">\r\n              Comprar\r\n            </button>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n    <!-- Overlay para móviles -->\r\n    <div id=\"cart-overlay\" class=\"cart-overlay\"></div>\r\n\r\n    <!-- Modal de Compra Exitosa -->\r\n    <div\r\n      class=\"modal fade\"\r\n      id=\"compraExitosaModal\"\r\n      tabindex=\"-1\"\r\n      aria-labelledby=\"compraExitosaModalLabel\"\r\n      aria-hidden=\"true\"\r\n    >\r\n      <div class=\"modal-dialog modal-dialog-centered\">\r\n        <div class=\"modal-content\">\r\n          <div class=\"modal-header bg-success text-white\">\r\n            <h5 class=\"modal-title\" id=\"compraExitosaModalLabel\">\r\n              ¡Compra Realizada!\r\n            </h5>\r\n            <button\r\n              type=\"button\"\r\n              class=\"btn-close btn-close-white\"\r\n              data-bs-dismiss=\"modal\"\r\n              aria-label=\"Close\"\r\n            ></button>\r\n          </div>\r\n          <div class=\"modal-body text-center\">\r\n            <div class=\"mb-3\">\r\n              <div class=\"text-success\" style=\"font-size: 4rem\">✓</div>\r\n            </div>\r\n            <h4>¡Tu compra se realizó exitosamente!</h4>\r\n            <p class=\"text-muted\">\r\n              Gracias por tu compra. Recibirás un email de confirmación con los\r\n              detalles de tu pedido.\r\n            </p>\r\n            <p>\r\n              <strong>Total pagado: $<span id=\"modal-total\">0</span></strong>\r\n            </p>\r\n          </div>\r\n          <div class=\"modal-footer\">\r\n            <button\r\n              type=\"button\"\r\n              class=\"btn btn-success\"\r\n              data-bs-dismiss=\"modal\"\r\n            >\r\n              Continuar Comprando\r\n            </button>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n    <footer\r\n      id=\"redes-sociales\"\r\n      class=\"bg-light p-4 mt-5 d-flex justify-content-between align-items-center\"\r\n    >\r\n      <img\r\n        src=\"https://dummyimage.com/120x120/cccccc/000000.png\"\r\n        width=\"120\"\r\n        height=\"120\"\r\n        alt=\"Logo\"\r\n      />\r\n      <div class=\"d-flex gap-4\">\r\n        <a href=\"https://www.facebook.com\" target=\"_blank\">\r\n          <img\r\n            src=\"https://dummyimage.com/60x60/cccccc/000000.png\"\r\n            width=\"60\"\r\n            height=\"60\"\r\n            alt=\"Facebook\"\r\n          />\r\n        </a>\r\n        <a href=\"https://www.instagram.com\" target=\"_blank\">\r\n          <img\r\n            src=\"https://dummyimage.com/60x60/cccccc/000000.png\"\r\n            width=\"60\"\r\n            height=\"60\"\r\n            alt=\"Instagram\"\r\n          />\r\n        </a>\r\n        <a href=\"https://www.x.com\" target=\"_blank\">\r\n          <img\r\n            src=\"https://dummyimage.com/600x60/cccccc/000000.png\"\r\n            width=\"60\"\r\n            height=\"60\"\r\n            alt=\"Twitter\"\r\n          />\r\n        </a>\r\n      </div>\r\n    </footer>\r\n\r\n    <script src=\"js/script.js\"></script>\r\n    <script src=\"https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js\"></script>\r\n    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js\"></script>\r\n  </body>\r\n</html>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/index.html b/index.html
+--- a/index.html	(revision 4201733bbd0a54f9430c73d1812f1ec432fcfbfe)
++++ b/index.html	(date 1754016532343)
+@@ -43,7 +43,7 @@
+ 
+     <main class="main-content">
+       <section class="portada text-center p-5">
+-        <h1>Mi web e-commerce</h1>
++        <h1>Tienda en linea</h1>
+         <p>
+           Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequatur
+           ducimus itaque rem!
+@@ -60,7 +60,7 @@
+         </div>
+       </section>
+ 
+-      <!-- Sección de reseñas -->
++      <!-- Sección de reseñas
+       <section id="reseñas" class="container my-5">
+         <h2 class="text-center">Reseñas</h2>
+         <div class="row">
+@@ -121,7 +121,7 @@
+             </div>
+           </div>
+         </div>
+-      </section>
++      </section>-->
+     </main>
+ 
+     <!-- CARRITO SIDEBAR -->
